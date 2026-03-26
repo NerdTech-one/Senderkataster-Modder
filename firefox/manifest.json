@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Senderkataster Modder by NerdTech",
+  "version": "1.1",
+  "permissions": [
+    "scripting", 
+    "declarativeNetRequest", 
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": [
+    "*://*.senderkataster.at/*"
+  ],
+  "description": "Adds additional functionality to the www.senderkataster.at website.",
+  "content_scripts": [
+    {
+      "matches": ["https://www.senderkataster.at/*"],
+      "js": ["content.js"],
+      "world": "MAIN", 
+      "run_at": "document_start"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "senderkataster-modder@nerdtech.local",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  }
+}
