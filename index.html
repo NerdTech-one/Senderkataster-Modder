@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senderkataster Modder Browser Redirect</title>
+    
+    <script>
+        function detectBrowserEngine() {
+          if (navigator.userAgentData) {
+            const isChromium = navigator.userAgentData.brands.some(
+              brandInfo => brandInfo.brand.includes("Chromium")
+            );
+            if (isChromium) return "Chromium";
+          }
+          
+          if (window.chrome) return "Chromium";
+        
+          if (/firefox/i.test(navigator.userAgent)) return "Firefox";
+        
+          return "Other";
+        }
+        
+        function redirectBasedOnBrowser() {
+          const browser = detectBrowserEngine();
+        
+          if (browser === "Chromium") {
+            window.location.replace("https://chromium-version.yourwebsite.com");
+          } else if (browser === "Firefox") {
+            window.location.replace("https://addons.mozilla.org/de/firefox/addon/senderkataster-modder/");
+          } else {
+            window.location.replace("https://github.com/NerdTech-one/Senderkataster-Modder");
+          }
+        }
+        
+        redirectBasedOnBrowser();
+    </script>
+</head>
+<body>
+    <p>Redirecting you to the optimized version of the site based on your browser...</p>
+
+    <noscript>
+        <p>JavaScript is required for automatic redirection. Please choose a version manually:</p>
+        <ul>
+            <li><a href="https://chromium-version.yourwebsite.com">Chromium Version (Chrome, Edge, Brave, Opera)</a></li>
+            <li><a href="https://addons.mozilla.org/de/firefox/addon/senderkataster-modder/">Firefox Version</a></li>
+            <li><a href="https://github.com/NerdTech-one/Senderkataster-Modder">GitHub</a></li>
+        </ul>
+    </noscript>
+</body>
+</html>
