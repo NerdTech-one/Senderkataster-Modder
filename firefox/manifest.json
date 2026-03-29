@@ -1,13 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Senderkataster Modder by NerdTech",
-  "version": "1.2",
-  "permissions": [
-    "scripting"
-  ],
-  "host_permissions": [
-    "*://*.senderkataster.at/*"
-  ],
+  "version": "1.2.2",
   "description": "Erweiterung um die Nutzererfahrung der Webseite senderkataster.at zu verbessern.",
   "content_scripts": [
     {

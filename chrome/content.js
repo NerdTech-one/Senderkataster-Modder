@@ -1,5 +1,5 @@
-const protokolleA1 = ['LTE, 5G', 'GSM, LTE, 5G'];
-const protokolleTmobile = ['2G, 4G', '4G', '2G, 4G, 5G'];
+const protokolleA1 = ['GSM', 'LTE, 5G', 'LTE', 'GSM, LTE, 5G'];
+const protokolleTmobile = ['2G', '2G, 4G', '4G', '2G, 4G, 5G'];
 const protokolleDrei = ['5G, GSM, LTE'];
 
 const labelA1 = "A1 Telekom Austria AG";
