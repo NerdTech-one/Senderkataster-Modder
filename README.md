@@ -11,13 +11,13 @@ Die Erweiterung hat die folgenden Funktionen:
 - Lade das Repo herunter und entpacke es.
 - Besuche die Seite `chrome://extensions/`, aktiviere den Entwicklermodus oben rechts.
 - Es erscheint oben links der Button „Entpackte Erweiterung laden“. Klicke auf ihn.
-- Wähle den entpackten Chrome-Ordner aus.
+- Wähle den entpackten Erweiterungs-Ordner aus.
 - Die Erweiterung steht dir bei künftigen Besuchen auf der Senderkataster-Webseite zur Verfügung.
 ### Firefox
 - Lade das Repo herunter und entpacke es.
 - Besuche die Seite `about:debugging#/runtime/this-firefox`.
 - Klicke auf den Button „Temporäres Add-on" laden.
-- Wähle das ZIP-Archiv im Firefox-Ordner aus.
+- Wähle das ZIP-Archiv im Erweiterungs-Ordner aus.
 - Die Erweiterung steht dir zumindest temporär bei künftigen Besuchen auf der Senderkataster-Webseite zur Verfügung.
 
 Erstellt in Zusammenarbeit mit Gemini 3.1 Pro Thinking via Perplexity Pro.

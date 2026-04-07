@@ -262,6 +262,11 @@ function getExistingOperators(table) {
           // It could be either Drei or A1
           ops.add(labelA1oderDrei);
         }
+      } else if (prot === 'LTE') {
+        const sl = getSendeleistungForRow(tr);
+        if (sl === '120-140 W') {
+          ops.add(labelA1oderDrei);
+        }
       }
     }
   });
@@ -271,15 +276,17 @@ function getExistingOperators(table) {
 // The core business logic: determines which operator operates a specific set of frequencies and assigns them a distinct color code for UI rendering.
 function resolveStation(protokolle, sendeleistung, table, currentRow) {
   // Direct protocol matches
-  if (protokolleA1.includes(protokolle)) {
+  if (protokolle === 'LTE' && sendeleistung === '120-140 W') {
+    return [true, labelA1oderDrei, colorA1oderDrei];
+  } else if (protokolleA1.includes(protokolle)) {
     return [true, labelA1, colorA1];
   } else if (protokolleTmobile.includes(protokolle)) {
     return [true, labelTmobile, colorTMobile];
   } else if (protokolleDrei.includes(protokolle)) {
     return [true, labelDrei, colorDrei];
-  } else if (protokolle === 'GSM, LTE') {
+  } else if (protokolle === 'GSM, LTE' || protokolle === 'LTE') {
     // Complex logic for 'GSM, LTE' which is used by multiple operators
-    if (sendeleistung !== '120-140 W' && sendeleistung !== '340-360 W') {
+    if ((sendeleistung !== '120-140 W' && (protokolle === 'GSM, LTE' || protokolle === 'LTE')) && (sendeleistung !== '340-360 W') && protokolle === 'GSM, LTE') {
       return [true, labelA1, colorA1];
     } else {
       // Checking what other operators are already on this tower
@@ -300,6 +307,11 @@ function resolveStation(protokolle, sendeleistung, table, currentRow) {
                 if (prot === 'GSM, LTE') {
                   const sl = getSendeleistungForRow(tr);
                   if (sl === '120-140 W' || sl === '340-360 W') {
+                    ambiguousRows.push(tr);
+                  }
+                } else if (prot === 'LTE') {
+                  const sl = getSendeleistungForRow(tr);
+                  if (sl === '120-140 W') {
                     ambiguousRows.push(tr);
                   }
                 }

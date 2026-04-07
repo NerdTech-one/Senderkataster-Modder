@@ -1,8 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Senderkataster Modder by NerdTech",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Erweiterung um die Nutzererfahrung der Webseite senderkataster.at zu verbessern.",
+  "default_locale": "de", 
+  "icons": {
+    "128": "128.png"
+  },
   "content_scripts": [
     {
       "matches": ["*://*.senderkataster.at/*"],
@@ -10,5 +14,14 @@
       "world": "MAIN", 
       "run_at": "document_start"
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "senderkataster-modder@nerdtech.one",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  }
 }
