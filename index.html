@@ -7,25 +7,27 @@
     
     <script>
         function detectBrowserEngine() {
-          if (navigator.userAgentData) {
-            const isChromium = navigator.userAgentData.brands.some(
-              brandInfo => brandInfo.brand.includes("Chromium")
-            );
-            if (isChromium) return "Chromium";
+          if (navigator.userAgentData && Array.isArray(navigator.userAgentData.brands)) {
+            const brands = navigator.userAgentData.brands.map(brandInfo => brandInfo.brand);
+            if (brands.some(brand => /Edge|Edg/i.test(brand))) return "Edge";
+            if (brands.some(brand => /Chrome|Chromium/i.test(brand))) return "Chrome";
           }
-          
-          if (window.chrome) return "Chromium";
-        
-          if (/firefox/i.test(navigator.userAgent)) return "Firefox";
-        
+
+          const ua = navigator.userAgent || "";
+          if (/Edg(e)?\//i.test(ua)) return "Edge";
+          if (/Chrome|Chromium/i.test(ua)) return "Chrome";
+          if (/Firefox/i.test(ua)) return "Firefox";
+
           return "Other";
         }
-        
+
         function redirectBasedOnBrowser() {
           const browser = detectBrowserEngine();
-        
-          if (browser === "Chromium") {
-            window.location.replace("https://github.com/NerdTech-one/Senderkataster-Modder");
+
+          if (browser === "Edge") {
+            window.location.replace("https://chromewebstore.google.com/detail/bjbcfpbcpfflgkcnbcckondiipanmfjk");
+          } else if (browser === "Chrome") {
+            window.location.replace("https://chromewebstore.google.com/detail/bjbcfpbcpfflgkcnbcckondiipanmfjk");
           } else if (browser === "Firefox") {
             window.location.replace("https://addons.mozilla.org/de/firefox/addon/senderkataster-modder/");
           } else {
@@ -42,7 +44,8 @@
     <noscript>
         <p>JavaScript is required for automatic redirection. Please choose a version manually:</p>
         <ul>
-            <li><a href="https://github.com/NerdTech-one/Senderkataster-Modder">Chromium Version (Chrome, Edge, Brave, Opera)</a></li>
+            <li><a href="https://chromewebstore.google.com/detail/bjbcfpbcpfflgkcnbcckondiipanmfjk">Microsoft Edge Version</a></li>
+            <li><a href="https://chromewebstore.google.com/detail/bjbcfpbcpfflgkcnbcckondiipanmfjk">Chromium Version (Chrome, Brave, Opera)</a></li>
             <li><a href="https://addons.mozilla.org/de/firefox/addon/senderkataster-modder/">Firefox Version</a></li>
             <li><a href="https://github.com/NerdTech-one/Senderkataster-Modder">GitHub</a></li>
         </ul>
