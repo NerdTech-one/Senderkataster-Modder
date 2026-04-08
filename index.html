@@ -6,7 +6,11 @@
     <title>Senderkataster Modder Browser Redirect</title>
     
     <script>
-        function detectBrowserEngine() {
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        async function detectBrowserEngine() {
+          console.log(navigator.userAgentData);
+          await delay(30000);
           if (navigator.userAgentData && Array.isArray(navigator.userAgentData.brands)) {
             const brands = navigator.userAgentData.brands.map(brandInfo => brandInfo.brand);
             if (brands.some(brand => /Edge|Edg/i.test(brand))) return "Edge";
@@ -21,11 +25,11 @@
           return "Other";
         }
 
-        function redirectBasedOnBrowser() {
-          const browser = detectBrowserEngine();
+        async function redirectBasedOnBrowser() {
+          const browser = await detectBrowserEngine();
 
           if (browser === "Edge") {
-            window.location.replace("https://chromewebstore.google.com/detail/bjbcfpbcpfflgkcnbcckondiipanmfjk");
+            window.location.replace("https://microsoftedge.microsoft.com/addons/detail/senderkataster-modder-by-/hnihgakaekppnibkojlampnopkfgignh");
           } else if (browser === "Chrome") {
             window.location.replace("https://chromewebstore.google.com/detail/bjbcfpbcpfflgkcnbcckondiipanmfjk");
           } else if (browser === "Firefox") {
@@ -44,7 +48,7 @@
     <noscript>
         <p>JavaScript is required for automatic redirection. Please choose a version manually:</p>
         <ul>
-            <li><a href="https://chromewebstore.google.com/detail/bjbcfpbcpfflgkcnbcckondiipanmfjk">Microsoft Edge Version</a></li>
+            <li><a href="https://microsoftedge.microsoft.com/addons/detail/senderkataster-modder-by-/hnihgakaekppnibkojlampnopkfgignh">Microsoft Edge Version</a></li>
             <li><a href="https://chromewebstore.google.com/detail/bjbcfpbcpfflgkcnbcckondiipanmfjk">Chromium Version (Chrome, Brave, Opera)</a></li>
             <li><a href="https://addons.mozilla.org/de/firefox/addon/senderkataster-modder/">Firefox Version</a></li>
             <li><a href="https://github.com/NerdTech-one/Senderkataster-Modder">GitHub</a></li>
