@@ -34,22 +34,21 @@ window.addEventListener('pointerdown', (e) => {
   function patchViewPrototype(obj) {
     // Only patch if it's an object, has the 'animate' function, and hasn't been patched yet.
     if (obj && typeof obj === 'object' && typeof obj.animate === 'function' && !obj._isAnimatePatched) {
-      
-      // Control of the animate() function
+      // Preserve the original animate() function so we can call it later.
       const origAnimate = obj.animate;
       obj.animate = function(...args) {
-        // Loop through all arguments passed to the animate function
+        // Iterate through all animation command objects passed to animate().
+        // The OpenLayers API can be called with several steps; we target the ones with zoom instructions.
         for (let i = 0; i < args.length; i++) {
           let arg = args[i];
-          // If the map is trying to animate to exactly zoom level 15...
           if (arg && typeof arg === 'object' && arg.zoom === 15) {
-            // If the user clicked a marker on the map, the zoom instruction will be deleted to prevent the map from annoyingly zooming out/in automatically.
-            // However, if they clicked a UI element (like searching an address), the default zoom behavior is allowed to happen.
+            // If the user clicked directly on the map canvas, suppress the automatic jump to zoom level 15.
+            // This avoids the map re-centering/zooming after selecting a marker inside the popup.
             if (lastInteractionWasMap) {
               try {
                 delete arg.zoom;
               } catch (e) {
-                // Fallback in case the property can't be deleted: animate to the current zoom level.
+                // If the object is frozen or cannot be mutated, preserve the current zoom level instead.
                 if (typeof this.getZoom === 'function') {
                   arg.zoom = this.getZoom();
                 }
@@ -57,34 +56,44 @@ window.addEventListener('pointerdown', (e) => {
             }
           }
         }
-        // Call the original OpenLayers animate function with our modified arguments
+        // Execute the original animation with the possibly adjusted arguments.
         return origAnimate.apply(this, args);
       };
-      
+
       obj._isAnimatePatched = true;
       console.log("Senderkataster Modder: OpenLayers View prototype patched!");
     }
   }
 
-  // Intercept Object.assign to catch inline configurations
+  // Intercept Object.assign to detect OpenLayers configuration objects created via object literals.
+  // This lets us modify map settings before the view is fully initialized without mutating source objects.
   const originalAssign = Object.assign;
   Object.assign = function(target, ...sources) {
-    sources.forEach(source => {
-      if (source) {
-        // If configuration objects enforce a maxZoom of 15, overwrite it to 22
-        if (source.maxZoom !== undefined && source.maxZoom === 15) {
-          source.maxZoom = 22;
+    const patchedSources = sources.map(source => {
+      if (source && source.maxZoom !== undefined && source.maxZoom === 15) {
+        try {
+          // Clone the source object before modifying it to avoid mutating frozen or shared data.
+          const cloned = Object.assign({}, source);
+          cloned.maxZoom = 22;
+          return cloned;
+        } catch (e) {
+          return source;
         }
       }
+      return source;
     });
+
     patchViewPrototype(target);
-    return originalAssign(target, ...sources);
+    return originalAssign(target, ...patchedSources);
   };
 
-  // Intercept function binding to patch the view context
+  // Intercept function binding so we can inspect contexts passed to bound functions.
+  // Only patch objects that appear to be OpenLayers views; avoid touching unrelated bind calls.
   const originalBind = Function.prototype.bind;
   Function.prototype.bind = function(context, ...args) {
-    patchViewPrototype(context);
+    if (context && typeof context === 'object' && typeof context.animate === 'function') {
+      patchViewPrototype(context);
+    }
     return originalBind.call(this, context, ...args);
   };
 })();
@@ -92,12 +101,7 @@ window.addEventListener('pointerdown', (e) => {
 // CSS INJECTIONS & UI TWEAKS
 // Injects custom CSS into the document early to hide annoying teasers instantly and to fix UI default sizing issues inside the dynamically rendered Angular map popups.
 const style = document.createElement('style');
-style.textContent = `
-  /* Hide unnecessary teasers to declutter the UI */
-  #teaser-container {
-    display: none !important;
-  }
-  
+style.textContent = `  
   /* Force override min-height on the OpenLayers popups to a more sensible value. */
   .ol-popup.visible {
     min-height: 169px !important;
@@ -109,8 +113,12 @@ style.textContent = `
     padding: 0px !important;
   }
 
+  table {
+    box-shadow: none !important;
+  }
+
   /* Remove default padding from Angular components */
-  .ol-popup-content.ng-star-inserted {
+  .ol-popup-content {
     padding: 0px !important;
   }
 
@@ -125,14 +133,21 @@ style.textContent = `
     top: 10px !important;
   }
 
-  /* Hide useless footer text */
-  .footer-text.ng-star-inserted {
-    display: none
+  /* Adjust the margins of the footer text */
+  .footer-text {
+    margin-left: 10px !important;
+    margin-top: 5px !important;
+    margin-bottom: 5px !important;
   }
   
   /* Remove vertical table cell padding for a more compact design. */
   table td {
     padding: 0px 10px !important;
+  }
+
+  @media screen and (max-width: 1279px) {
+    .popup-scroll-content[_ngcontent-ng-c2067059690] {
+      margin-bottom: 0px !important;
   }
 
   /* Responsive height adjustments for taller monitors */
@@ -144,7 +159,7 @@ style.textContent = `
     }
     .popup-scroll-content {
       min-height: 189px !important;
-      max-height: 320px !important;
+      max-height: 296px !important;
       height: auto !important;
     }
   }
@@ -187,8 +202,70 @@ style.textContent = `
     }
   }
 `;
-// Appended safely to documentElement so it applies immediately, even before the <head> or <body> tags fully parse.
-document.documentElement.appendChild(style);
+
+function appendStyleToHead() {
+  // Attempts to append the style element to the end of the document's head.
+  // Returns true if successful, false if head is not available.
+  const head = document.head || document.querySelector('head');
+  if (!head) return false;
+  if (head.lastElementChild !== style) {
+    head.appendChild(style);
+  }
+  return true;
+}
+
+function styleInjection() {
+  const injected = appendStyleToHead();
+  if (!injected) return false;
+
+  const head = document.head || document.querySelector('head');
+  if (head && head.lastElementChild !== style) {
+    head.appendChild(style);
+  }
+
+  return true;
+}
+
+// ------------------------------------------------------------------
+// IMPROVED TEASER CLOSING LOGIC
+// The website shows a teaser panel on the right side of the screen or a full screen overlay that can be closed by clicking an "X" button. 
+// However, this button is not present in the DOM immediately and only appears after some time. 
+// This function uses a MutationObserver to watch for changes in the DOM and automatically clicks the close button as soon as it appears.
+// This ensures a cleaner user experience without manual intervention especially for frequent users of the website.
+
+let teaserDismissed = false;
+let teaserTimeoutExpired = false;
+setTimeout(() => {
+  teaserTimeoutExpired = true;
+}, 10000);
+
+function tryDismiss() {
+  if (teaserDismissed || teaserTimeoutExpired) return;
+
+  // 1. Desktop: sidebar teaser panel
+  const closeTeaser = document.getElementById("close-teaser");
+  if (closeTeaser) {
+    closeTeaser.click();
+    teaserDismissed = true;
+    return;
+  }
+
+  // 2. Mobile: Angular Material dialog containing the welcome text.
+  const dialogs = document.querySelectorAll(".mat-mdc-dialog-container");
+  for (const dialog of dialogs) {
+    if (dialog.textContent.includes("Willkommen beim Senderkataster")) {
+      // Try a dedicated close button first (icon button at the top)
+      const closeBtn = dialog.querySelector("[mat-dialog-close]");
+
+      if (closeBtn) {
+        closeBtn.click();
+      }
+      teaserDismissed = true;
+      return;
+    }
+  }
+}
+
 // ------------------------------------------------------------------
 // DOM PARSING & INJECTION LOGIC
 //
@@ -346,7 +423,8 @@ function runExtensionLogic() {
   if (!popupContent) return;
 
   // CLEANUP Phase
-  // Removes previously injected '.extension-row' elements if the underlying data they relied on has changed or vanished (to prevent stale data).
+  // Remove any injected rows that are no longer valid, for example if the popup content has been refreshed
+  // and previous 'Netzbetreiber (Erweiterung)' rows no longer correspond to the current table structure.
   popupContent.querySelectorAll('.extension-row').forEach(customRow => {
     const nextRow = customRow.nextElementSibling;
     const tds = nextRow.querySelectorAll('td');
@@ -357,7 +435,7 @@ function runExtensionLogic() {
   });
 
   // INJECT Phase
-  // Loop through all native table rows to find "Protokoll(e)" entries.
+  // Find each native 'Protokoll(e)' row and insert our resolved operator row directly above it.
   popupContent.querySelectorAll('tr').forEach(row => {
     if (row.classList.contains('extension-row')) return;
 
@@ -369,14 +447,14 @@ function runExtensionLogic() {
     const protokolle = tds[1].textContent.trim();
     const sendeleistung = getSendeleistungForRow(row);
 
-    // Determine which operator owns this protocol/transmission power combination
+    // Determine which operator owns this protocol/transmission power combination.
     const resolutionResult = resolveStation(protokolle, sendeleistung, table, row);
 
     if (resolutionResult[0]) {
-      // Prevent double injection if a custom row already exists immediately prior
+      // If we already injected a row immediately above this one, do not inject again.
       if (row.previousElementSibling && row.previousElementSibling.classList.contains('extension-row')) return;
 
-      // Create our custom row displaying the resolved operator name
+      // Create our custom row and mirror the original row's attributes so it appears natural.
       const newRow = document.createElement('tr');
       const td1 = document.createElement('td');
       const td2 = document.createElement('td');
@@ -384,7 +462,7 @@ function runExtensionLogic() {
       td1.textContent = 'Netzbetreiber (Erweiterung)';
       td2.textContent = resolutionResult[1];
 
-      // Copy styling/attributes from the original row to make our custom row blend in natively
+      // Preserve any important row/table styling and markup from the original row.
       Array.from(row.attributes).forEach(attr => newRow.setAttribute(attr.nodeName, attr.nodeValue));
       Array.from(tds[0].attributes).forEach(attr => td1.setAttribute(attr.nodeName, attr.nodeValue));
       Array.from(tds[1].attributes).forEach(attr => td2.setAttribute(attr.nodeName, attr.nodeValue));
@@ -394,35 +472,44 @@ function runExtensionLogic() {
       newRow.appendChild(td1);
       newRow.appendChild(td2);
 
-      // Insert our new custom row right before the "Protokoll(e)" row
+      // Insert the custom row directly before the associated protocol row.
       row.insertAdjacentElement('beforebegin', newRow);
     }
   });
 }
 
-// A MutationObserver is used to monitor the DOM for changes, because the map popups are dynamically generated and destroyed by Angular.
+// A MutationObserver is used to monitor the DOM for changes
 const observer = new MutationObserver((mutations) => {
-  // Briefly disconnect the observer to prevent infinite loops when we modify the DOM ourselves
+  // Temporarily disconnect the observer to avoid reacting to our own DOM changes while we process the popup.
   observer.disconnect();
   try {
+    // Ensure the custom CSS is present before any popup logic runs.
+    styleInjection();
+
+    // Try to dismiss teasers as early as possible, but only until a timeout expires.
+    if (!teaserDismissed && !teaserTimeoutExpired) {
+      tryDismiss();
+    }
+
+    // Process each mutation entry provided by the observer.
     for (let mutation of mutations) {
-      // If elements are added/changed, specifically the map's popup-content
+      // If the mutation occurred directly inside the popup content area, update the extension rows.
       if (mutation.target && mutation.target.nodeType === Node.ELEMENT_NODE) {
         if (mutation.target.id === 'popup-content' || mutation.target.closest('#popup-content')) {
           runExtensionLogic();
-          break; 
+          break;
         }
       }
     }
   } finally {
-    // Re-attach the observer once we are done making changes
-    initializeObserver();
+    // Reconnect the observer after processing so future DOM changes are tracked again.
+    observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
   }
 });
 
 function initializeObserver() {
-  const mapContainer = document.getElementById('map-container') || document.body;
-  if (mapContainer) observer.observe(mapContainer, { childList: true, subtree: true, characterData: true });
+  styleInjection();
+  observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
 }
 
 document.addEventListener('DOMContentLoaded', initializeObserver);
