@@ -7,10 +7,10 @@ const labelTmobile = "T-Mobile Austria GmbH";
 const labelDrei = "Hutchison Drei Austria GmbH";
 const labelA1oderDrei = "Hutchison Drei Austria GmbH oder A1 Telekom Austria AG";
 
-const colorA1 = '#ffc1c1';
-const colorA1oderDrei = '#e6f2ff';
-const colorTMobile = '#fce4ec';
-const colorDrei = '#fff3e0';
+const colorA1 = '#cbcbcb';
+const colorA1oderDrei = '#e4b3e5';
+const colorTMobile = '#b6cb92';
+const colorDrei = '#98bcee';
 
 // ------------------------------------------------------------------
 // INTERACTION TRACKER
@@ -148,6 +148,7 @@ style.textContent = `
   @media screen and (max-width: 1279px) {
     .popup-scroll-content[_ngcontent-ng-c2067059690] {
       margin-bottom: 0px !important;
+    }
   }
 
   /* Responsive height adjustments for taller monitors */
@@ -157,6 +158,7 @@ style.textContent = `
       max-height: 358px !important;
       height: auto !important;
     }
+      
     .popup-scroll-content {
       min-height: 189px !important;
       max-height: 296px !important;
@@ -171,6 +173,7 @@ style.textContent = `
       max-height: 506px !important;
       height: auto !important;
     }
+
     .popup-scroll-content {
       min-height: 189px !important;
       max-height: 468px !important;
