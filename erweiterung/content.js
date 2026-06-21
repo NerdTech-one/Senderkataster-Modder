@@ -243,6 +243,10 @@ style.textContent = `
       margin-bottom: 0px !important;
       max-height: calc(100% - 68px) !important;
     }
+
+    #address-search-container[_ngcontent-ng-c1710500981] {
+      max-width: calc(100vw - 20px);
+    }
   }
 
   /* Responsive height adjustments for taller monitors */
@@ -255,7 +259,7 @@ style.textContent = `
       
     app-root .popup-scroll-content.popup-scroll-content {
       min-height: 189px !important;
-      max-height: 296px !important;
+      max-height: 286px !important;
       height: auto !important;
     }
   }
@@ -286,6 +290,38 @@ style.textContent = `
     app-root .ol-popup.visible {
       min-width: auto !important;
       width: 100% !important;
+    }
+  }
+
+  @media screen and (max-width: 1023px) {
+    #address-container[_ngcontent-ng-c1528484925] {
+        width: 390px !important;
+    }
+  }
+
+  @media screen and (max-width: 991px) and (min-width: 768px) {
+    #address-search-container[_ngcontent-ng-c1710500981] {
+      left: 0px;
+    }
+
+    #address-container[_ngcontent-ng-c1528484925] {
+        width: 672px !important;
+    }
+  }
+
+  @media screen and (max-width: 767px) and (min-width: 576px) {
+    #address-search-container[_ngcontent-ng-c1710500981] {
+      left: 0px;
+    }
+
+    #address-container[_ngcontent-ng-c1528484925] {
+        width: 492px !important;
+    }
+  }
+
+  @media screen and (max-width: 575px) {
+    #address-container[_ngcontent-ng-c1528484925] {
+        width: calc(100vw - 70px) !important;
     }
   }
 `;
