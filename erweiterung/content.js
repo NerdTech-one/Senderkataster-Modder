@@ -1,4 +1,4 @@
-const protokolleA1 = ['GSM', 'LTE, 5G', 'LTE', 'GSM, LTE, 5G'];
+const protokolleA1 = ['GSM', 'GSM, 5G', 'LTE, 5G', 'LTE', 'GSM, LTE, 5G'];
 const protokolleTmobile = ['2G', '2G, 4G', '4G', '2G, 4G, 5G'];
 const protokolleDrei = ['5G, GSM, LTE'];
 
@@ -238,6 +238,22 @@ style.textContent = `
     margin-top: 0px !important;
   }
 
+  mat-option[_ngcontent-ng-c1528484925] {
+    line-height: 20px !important;
+  }
+
+  @media screen and (min-width: 1280px) {
+    .cdk-overlay-pane {
+      width: 390px !important;
+    }
+  }
+
+  @media screen and (min-width: 992px) and (max-width: 1279px) {
+    .cdk-overlay-pane {
+      width: 438px !important;
+    }
+  }
+
   @media screen and (max-width: 1279px) {
     app-root .popup-scroll-content.popup-scroll-content {
       margin-bottom: 0px !important;
@@ -246,6 +262,10 @@ style.textContent = `
 
     #address-search-container[_ngcontent-ng-c1710500981] {
       max-width: calc(100vw - 20px);
+    }
+    
+    .cdk-overlay-pane {
+      width: calc(100vw + 28px);;
     }
   }
 
@@ -295,7 +315,7 @@ style.textContent = `
 
   @media screen and (max-width: 1023px) {
     #address-container[_ngcontent-ng-c1528484925] {
-        width: 390px !important;
+      width: 390px !important;
     }
   }
 
@@ -305,7 +325,11 @@ style.textContent = `
     }
 
     #address-container[_ngcontent-ng-c1528484925] {
-        width: 672px !important;
+      width: 672px !important;
+    }
+
+    .cdk-overlay-pane {
+      width: 720px !important;
     }
   }
 
@@ -315,13 +339,21 @@ style.textContent = `
     }
 
     #address-container[_ngcontent-ng-c1528484925] {
-        width: 492px !important;
+      width: 492px !important;
+    }
+
+    .cdk-overlay-pane {
+      width: 540px !important;
     }
   }
 
   @media screen and (max-width: 575px) {
     #address-container[_ngcontent-ng-c1528484925] {
-        width: calc(100vw - 70px) !important;
+      width: calc(100vw - 70px) !important;
+    }
+
+    .cdk-overlay-pane {
+      width: calc(100vw - 22px) !important;
     }
   }
 `;
