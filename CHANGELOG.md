@@ -46,3 +46,6 @@ Lokalisierung auf Deutsch für den Microsoft Edge Add-Ons Store.
 ## Version 1.3.2
 - Verbessert die Darstellung der Suchergebnisse des Adresseingabefeldes.
 - Mapping für GSM, 5G wurde hinzugefügt.
+
+## Version 1.3.3
+- Darstellung des Menüs der Kartenmaterialauswahl korrigiert. 

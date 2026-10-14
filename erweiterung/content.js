@@ -242,6 +242,10 @@ style.textContent = `
     line-height: 20px !important;
   }
 
+  #mat-menu-panel-1 {
+    margin-left: auto !important;
+  }
+
   @media screen and (min-width: 1280px) {
     .cdk-overlay-pane {
       width: 390px !important;
